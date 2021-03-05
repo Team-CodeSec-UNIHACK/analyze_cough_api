@@ -7,6 +7,8 @@ from fastapi import FastAPI, File, UploadFile
 from fastai import *
 from fastai.vision import *
 from io import BytesIO
+from PIL import Image
+
 app = FastAPI()
 
 learn = load_learner("model/", "stage-1.pth")
@@ -35,5 +37,9 @@ async def analyze_audio(file: UploadFile = File(...)):
     pylab.specgram(sound_info, Fs=frame_rate)
     filename = str(uuid.uuid4())
     pylab.savefig('tmp/'+filename+".png")
-
-    return {"item_id": "", "q": ""}
+    path = 'tmp/'+filename+".png"
+    im = Image.open(path)
+    img_bytes = await (im.os.read())
+    img = open_image(BytesIO(img_bytes))
+    prediction = learn.predict(img)[0]
+    return {'result': str(prediction)}
