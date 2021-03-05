@@ -6,11 +6,10 @@ import uuid
 from fastapi import FastAPI, File, UploadFile
 from fastai import *
 from fastai.vision import *
-from fastai import load_model
 from io import BytesIO
 app = FastAPI()
 
-learn = load_model("model/stage-1.pth")
+learn = load_learner("model/", "stage-1.pth")
 
 def get_wav_info(wav_file):
     wav = wave.open(wav_file, 'r')
@@ -36,4 +35,5 @@ async def analyze_audio(file: UploadFile = File(...)):
     pylab.specgram(sound_info, Fs=frame_rate)
     filename = str(uuid.uuid4())
     pylab.savefig('tmp/'+filename+".png")
+
     return {"item_id": "", "q": ""}
